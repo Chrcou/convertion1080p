@@ -22,7 +22,7 @@ COPY . .
 
 # --- Étape 2 : Image finale avec FFmpeg et l'application ---
 # Utilise la même image de base Node.js pour assurer la cohérence et avoir Node.js pré-installé
-FROM node:lts-slim
+FROM arm64v8/node:lts-slim
 
 # Définit le répertoire de travail pour l'image finale
 WORKDIR /app

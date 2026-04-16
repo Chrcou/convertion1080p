@@ -175,7 +175,8 @@ const ffmpegSupportedInputExtensions = [
   "pulse",
   "sndio",
   "v4l2",
-  "x11grab","webm"
+  "x11grab",
+  "webm",
 ];
 const directoryPath = "/path/to/your/directory";
 
@@ -190,53 +191,6 @@ export class FfmpegService {
   }
 
   onAddingFile(filePath: string) {
-    console.log("the file to work with is " + filePath);
-    let exists = this.doesFileExists(filePath);
-    console.log(exists, path.parse(filePath).ext);
-
-    if (
-        exists &&
-        this.ffmpegSupportedInputExtensions.includes(
-            path.parse(filePath).ext.replace(".", "")
-        )
-    ) {
-        let inputPathObject = path.parse(filePath);
-        f.cl("Fichier à convertir :", path.format(inputPathObject));
-
-        // Échappement des chemins pour FFmpeg
-        const escapedInputPath = filePath.replace(/"/g, '\\"');
-        const escapedOutputPath = `"${this.outputPath}${path.parse(filePath).name}_apple_tv_1080p.mp4"`.replace(/"/g, '\\"');
-
-        // Construction de la commande FFmpeg en une seule ligne, sans saut de ligne
-        const execString = `
-            ffmpeg -i "${escapedInputPath}" \
-            -c:v libx264 -profile:v high -level 4.0 -preset slow -crf 18 \
-            -vf "scale=-2:1080" \
-            -c:a aac -b:a 192k -ac 2 \
-            -movflags +faststart \
-            "${escapedOutputPath}"
-        `.replace(/\s+/g, ' ').trim(); // Supprime les sauts de ligne et espaces multiples
-
-        f.cl(execString);
-
-        const ffMpegTreatment = exec(execString, { shell: '/bin/bash' }, function (err, stdout, stderr) {
-            if (err) {
-                console.error("Erreur FFmpeg :", err);
-                console.error("Sortie stderr :", stderr);
-            } else {
-                console.log("Conversion réussie :", stdout);
-            }
-        });
-
-        ffMpegTreatment.on("exit", function (code) {
-            f.cl("Code de sortie FFmpeg :", code);
-        });
-    } else {
-        console.log("Fichier non traité : extension non supportée ou fichier introuvable.");
-    }
-}
-
-  onAddingFile2(filePath: string) {
     // f.cl("the file to work with is " + filePath);
 
     let exists = this.doesFileExists(filePath);
@@ -249,17 +203,13 @@ export class FfmpegService {
     ) {
       let inputPathObject = path.parse(filePath);
       f.cl("sortie ::::", path.format(inputPathObject));
-      let execString = `ffmpeg -i "$$$$"
-            -c:v libx264 -profile:v high -level 4.0 -preset slow -crf 18
-            -vf "scale=-2:1080"
-            -c:a aac -b:a 192k -ac 2
-            -movflags +faststart
-            "@@@@@"`
-        .replace("$$$$", '"' + filePath + '"')
-        .replace(
-          "@@@@@",
-          '"' + this.outputPath + path.parse(filePath).name + '.mp4"',
-        );
+      let execString =
+        'ffmpeg -i $$$$ -c:v libx264 -profile:v high -level 4.0 -preset slow -crf 18 -x264opts ref=4:bframes=3:b-adapt=2:direct=auto:analyse=all:me=umh:subme=7:trellis=1 -vf "scale=1920:-2,format=yuv420p" -c:a aac -b:a 192k -ac 2 -movflags +faststart @@@@@'
+          .replace("$$$$", '"' + filePath + '"')
+          .replace(
+            "@@@@@",
+            '"' + this.outputPath + path.parse(filePath).name + '.mp3"',
+          );
       f.cl(execString);
       const ffMpegTreatment = exec(execString, function (err, stdout, stderr) {
         if (err) {
