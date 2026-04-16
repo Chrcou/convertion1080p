@@ -190,6 +190,52 @@ export class FfmpegService {
   }
 
   onAddingFile(filePath: string) {
+    let exists = this.doesFileExists(filePath);
+    console.log(exists, path.parse(filePath).ext);
+
+    if (
+        exists &&
+        this.ffmpegSupportedInputExtensions.includes(
+            path.parse(filePath).ext.replace(".", "")
+        )
+    ) {
+        let inputPathObject = path.parse(filePath);
+        f.cl("Fichier à convertir :", path.format(inputPathObject));
+
+        // Échappement des chemins pour FFmpeg
+        const escapedInputPath = filePath.replace(/"/g, '\\"');
+        const escapedOutputPath = `"${this.outputPath}${path.parse(filePath).name}_apple_tv_1080p.mp4"`.replace(/"/g, '\\"');
+
+        // Construction de la commande FFmpeg en une seule ligne, sans saut de ligne
+        const execString = `
+            ffmpeg -i "${escapedInputPath}" \
+            -c:v libx264 -profile:v high -level 4.0 -preset slow -crf 18 \
+            -vf "scale=-2:1080" \
+            -c:a aac -b:a 192k -ac 2 \
+            -movflags +faststart \
+            "${escapedOutputPath}"
+        `.replace(/\s+/g, ' ').trim(); // Supprime les sauts de ligne et espaces multiples
+
+        f.cl(execString);
+
+        const ffMpegTreatment = exec(execString, { shell: '/bin/bash' }, function (err, stdout, stderr) {
+            if (err) {
+                console.error("Erreur FFmpeg :", err);
+                console.error("Sortie stderr :", stderr);
+            } else {
+                console.log("Conversion réussie :", stdout);
+            }
+        });
+
+        ffMpegTreatment.on("exit", function (code) {
+            f.cl("Code de sortie FFmpeg :", code);
+        });
+    } else {
+        console.log("Fichier non traité : extension non supportée ou fichier introuvable.");
+    }
+}
+
+  onAddingFile2(filePath: string) {
     // f.cl("the file to work with is " + filePath);
 
     let exists = this.doesFileExists(filePath);
