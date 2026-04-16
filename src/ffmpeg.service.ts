@@ -175,7 +175,7 @@ const ffmpegSupportedInputExtensions = [
   "pulse",
   "sndio",
   "v4l2",
-  "x11grab",
+  "x11grab","webm"
 ];
 const directoryPath = "/path/to/your/directory";
 
@@ -190,6 +190,7 @@ export class FfmpegService {
   }
 
   onAddingFile(filePath: string) {
+    console.log("the file to work with is " + filePath);
     let exists = this.doesFileExists(filePath);
     console.log(exists, path.parse(filePath).ext);
 

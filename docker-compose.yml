@@ -1,10 +1,21 @@
-version: '3.8'
+version: "3.8"
 services:
   devcontainer:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    build:
+      context: . # Le contexte de construction est le répertoire actuel (où se trouve le compose.yaml)
+      dockerfile: ./dockerfile # Chemin vers votre Dockerfile
+    container_name: convert1080p2 # Un nom explicite pour votre conteneur
+    ports:
+      - 1404:3000
+        # Exemple : Si votre application Node.js écoute sur le port 3000
+        # Modifiez si votre application utilise un port différent
     volumes:
-      - ./:/toConvert
-   
+      - /Users/chris/Desktop/test:/toConvert # <--- CORRECTION ICI : tiret, espace, sur une nouvelle ligne
+      # Si vous avez d'autres volumes à monter, ajoutez-les ici avec un tiret devant :
+      # - /chemin/sur/l_hote/autre:/chemin/dans/le_conteneur/autre
+      # Vous pourriez aussi vouloir ajouter des variables d'environnement, par exemple :
+      # environment:
+      #   - NODE_ENV=production
+    restart: unless-stopped # Redémarre le conteneur sauf s'il est arrêté manuellement
+networks: {}
 
