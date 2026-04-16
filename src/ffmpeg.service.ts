@@ -208,7 +208,7 @@ export class FfmpegService {
           .replace("$$$$", '"' + filePath + '"')
           .replace(
             "@@@@@",
-            '"' + this.outputPath + path.parse(filePath).name + '.mp3"',
+            '"' + this.outputPath + path.parse(filePath).name + '.mp4"',
           );
       f.cl(execString);
       const ffMpegTreatment = exec(execString, function (err, stdout, stderr) {
